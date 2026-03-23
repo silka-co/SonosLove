@@ -242,10 +242,26 @@ export class SonosService {
     }
   }
 
+  async addToGroup(coordinatorId: string, newMemberId: string): Promise<void> {
+    const coordinator = this.getDeviceOrThrow(coordinatorId);
+    const member = this.getDeviceOrThrow(newMemberId);
+    await member.AVTransportService.SetAVTransportURI({
+      InstanceID: 0,
+      CurrentURI: `x-rincon:${coordinator.Uuid}`,
+      CurrentURIMetaData: '',
+    });
+    logger.info(`Added to group: ${member.Name} -> ${coordinator.Name}`);
+  }
+
   async ungroupSpeaker(speakerId: string): Promise<void> {
     const device = this.getDeviceOrThrow(speakerId);
-    await device.AVTransportService.BecomeCoordinatorOfStandaloneGroup({ InstanceID: 0 });
-    logger.info(`Ungrouped: ${device.Name}`);
+    try {
+      await device.AVTransportService.BecomeCoordinatorOfStandaloneGroup({ InstanceID: 0 });
+      logger.info(`Ungrouped: ${device.Name}`);
+    } catch (err) {
+      // Speaker might already be standalone — that's fine
+      logger.debug(`Ungroup (already standalone?): ${device.Name}: ${err}`);
+    }
   }
 
   async getNowPlaying(speakerId: string): Promise<NowPlayingState> {

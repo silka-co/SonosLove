@@ -27,6 +27,20 @@ export function createSpeakersRouter(sonosService: SonosService): Router {
     }
   });
 
+  router.post('/add-to-group', async (req, res) => {
+    try {
+      const { coordinator, member } = req.body;
+      if (!coordinator || !member) {
+        res.status(400).json({ message: 'coordinator and member required' });
+        return;
+      }
+      await sonosService.addToGroup(coordinator, member);
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to add speaker to group' });
+    }
+  });
+
   router.post('/ungroup', async (req, res) => {
     try {
       const { speakerId } = req.body;

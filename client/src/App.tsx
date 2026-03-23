@@ -1,17 +1,12 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AppShell } from './components/layout/AppShell';
 import { NowPlayingPage } from './pages/NowPlayingPage';
-import { SpeakersPage } from './pages/SpeakersPage';
+import styles from './components/layout/AppShell.module.css';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<AppShell />}>
-          <Route path="/" element={<NowPlayingPage />} />
-          <Route path="/speakers" element={<SpeakersPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <div className={styles.shell}>
+      <main className={styles.content}>
+        <NowPlayingPage />
+      </main>
+    </div>
   );
 }

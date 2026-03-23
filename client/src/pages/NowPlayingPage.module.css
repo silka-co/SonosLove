@@ -10,6 +10,24 @@
   justify-content: center;
 }
 
+.speakerList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+  width: 100%;
+}
+
+.speakerListLabel {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  text-align: center;
+  margin-bottom: var(--space-xs);
+}
+
 @media (min-width: 768px) {
   .page {
     padding-top: var(--space-2xl);

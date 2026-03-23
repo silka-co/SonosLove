@@ -17,6 +17,8 @@ export const api = {
   getSpeakers: () => request<import('../types').SpeakerState[]>('/speakers'),
   groupSpeakers: (coordinator: string, members: string[]) =>
     request('/speakers/group', { method: 'POST', body: JSON.stringify({ coordinator, members }) }),
+  addToGroup: (coordinator: string, member: string) =>
+    request('/speakers/add-to-group', { method: 'POST', body: JSON.stringify({ coordinator, member }) }),
   ungroupSpeaker: (speakerId: string) =>
     request('/speakers/ungroup', { method: 'POST', body: JSON.stringify({ speakerId }) }),
 
