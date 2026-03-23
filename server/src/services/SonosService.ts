@@ -1,4 +1,5 @@
 import { SonosManager, SonosDevice } from '@svrooij/sonos';
+import type { Track } from '@svrooij/sonos/lib/models';
 import { EventEmitter } from 'events';
 import type { SpeakerState, NowPlayingState } from '../types/index.js';
 import { logger } from '../utils/logger.js';
@@ -57,10 +58,16 @@ export class SonosService {
     this.cachedSpeakers = speakers;
     this.emitter.emit('stateChange', speakers);
 
-    // Also check now-playing for any playing speaker
+    // Check now-playing: find any speaker that's playing, then query its
+    // group coordinator for metadata (AirPlay metadata lives on the coordinator)
     for (const s of speakers) {
-      if (s.playbackState === 'playing' && s.isCoordinator) {
-        const np = await this.getNowPlaying(s.id);
+      if (s.playbackState === 'playing') {
+        // Find the group coordinator for this speaker
+        const device = this.getDevice(s.id);
+        const coordId = device?.Coordinator?.Uuid ?? s.id;
+        const np = await this.getNowPlaying(coordId);
+        // Tag the now-playing with the room the user sees, not the coordinator's id
+        np.speakerId = s.id;
         this.emitter.emit('nowPlayingChange', np);
         break;
       }
@@ -92,7 +99,23 @@ export class SonosService {
   private async buildSpeakerStates(): Promise<SpeakerState[]> {
     const speakers: SpeakerState[] = [];
 
+    // Deduplicate stereo pairs: multiple devices with the same name are a
+    // stereo pair — keep only one per unique name (prefer the coordinator).
+    const seen = new Map<string, SonosDevice>();
     for (const device of this.manager.Devices) {
+      const name = device.Name;
+      const existing = seen.get(name);
+      if (!existing) {
+        seen.set(name, device);
+      } else {
+        // Prefer the coordinator
+        const isCoord = device.Coordinator?.Uuid === device.Uuid;
+        if (isCoord) seen.set(name, device);
+      }
+    }
+    const visibleDevices = Array.from(seen.values());
+
+    for (const device of visibleDevices) {
       try {
         const state = await this.buildOneSpeakerState(device);
         speakers.push(state);
@@ -232,14 +255,46 @@ export class SonosService {
       const transportInfo = await device.AVTransportService.GetTransportInfo({ InstanceID: 0 });
       const isPlaying = transportInfo.CurrentTransportState === 'PLAYING';
 
+      // TrackMetaData can be a parsed Track object or a raw DIDL-Lite XML string
+      const meta = positionInfo.TrackMetaData;
+      let trackTitle = '';
+      let artist = '';
+      let album = '';
+      let albumArtUrl = '';
+
+      if (meta && typeof meta === 'object') {
+        // Library successfully parsed the DIDL-Lite metadata
+        const track = meta as Track;
+        trackTitle = track.Title ?? '';
+        artist = track.Artist ?? '';
+        album = track.Album ?? '';
+        albumArtUrl = track.AlbumArtUri ?? '';
+      } else if (typeof meta === 'string' && meta.length > 0) {
+        // Raw DIDL-Lite XML — extract fields with regex
+        trackTitle = extractXmlTag(meta, 'dc:title') ?? '';
+        artist = extractXmlTag(meta, 'dc:creator') ?? '';
+        album = extractXmlTag(meta, 'upnp:album') ?? '';
+        albumArtUrl = extractXmlTag(meta, 'upnp:albumArtURI') ?? '';
+      }
+
+      // Don't show raw x-rincon URIs as track titles
+      if (trackTitle.startsWith('x-rincon:') || trackTitle.startsWith('x-sonos:')) {
+        trackTitle = '';
+      }
+
+      // Make album art URLs absolute if they're relative
+      if (albumArtUrl && !albumArtUrl.startsWith('http')) {
+        albumArtUrl = `http://${device.Host}:1400${albumArtUrl}`;
+      }
+
       return {
         speakerId: device.Uuid,
-        trackTitle: (positionInfo as any).TrackMetaData?.Title ?? (positionInfo as any).TrackURI ?? '',
-        artist: (positionInfo as any).TrackMetaData?.Artist ?? '',
-        album: (positionInfo as any).TrackMetaData?.Album ?? '',
-        albumArtUrl: (positionInfo as any).TrackMetaData?.AlbumArtUri ?? '',
-        durationSeconds: parseDuration((positionInfo as any).TrackDuration ?? '0:00:00'),
-        positionSeconds: parseDuration((positionInfo as any).RelTime ?? '0:00:00'),
+        trackTitle,
+        artist,
+        album,
+        albumArtUrl,
+        durationSeconds: parseDuration(positionInfo.TrackDuration ?? '0:00:00'),
+        positionSeconds: parseDuration(positionInfo.RelTime ?? '0:00:00'),
         isPlaying,
       };
     } catch (err) {
@@ -279,4 +334,10 @@ function parseDuration(duration: string): number {
   if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
   if (parts.length === 2) return parts[0] * 60 + parts[1];
   return parts[0] || 0;
+}
+
+function extractXmlTag(xml: string, tag: string): string | undefined {
+  const regex = new RegExp(`<${tag}[^>]*>([^<]*)</${tag}>`, 'i');
+  const match = xml.match(regex);
+  return match?.[1] || undefined;
 }
