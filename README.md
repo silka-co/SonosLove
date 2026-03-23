@@ -2,6 +2,8 @@
 
 A local web app that talks directly to your Sonos speakers via UPnP, bypassing the Sonos app and its cloud infrastructure. Built because the Sonos app keeps losing track of speakers that are clearly on the network.
 
+Read the full story behind why this was built: [I got tired of fighting with my Sonos app. So I built my own solution.](https://open.substack.com/pub/silkasietsma/p/i-got-tired-of-fighting-with-my-sonos?r=e2sng&utm_campaign=post&utm_medium=web)
+
 ## What it does
 
 - **Discovers speakers directly** via UPnP on your local network — finds speakers even when the Sonos app says "Not Connected"
