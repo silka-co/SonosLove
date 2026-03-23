@@ -1,0 +1,25 @@
+.dot {
+  display: inline-block;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.sm {
+  width: 6px;
+  height: 6px;
+}
+
+.md {
+  width: 8px;
+  height: 8px;
+}
+
+.online {
+  background: var(--status-online);
+  box-shadow: 0 0 6px var(--status-online);
+}
+
+.offline {
+  background: var(--status-offline);
+  box-shadow: 0 0 6px var(--status-offline);
+}

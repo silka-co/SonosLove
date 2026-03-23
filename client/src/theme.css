@@ -1,0 +1,66 @@
+:root {
+  /* Background layers */
+  --bg-base: #0c0c0e;
+  --bg-surface: #141416;
+  --bg-elevated: #1a1a1e;
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-active: rgba(255, 255, 255, 0.06);
+
+  /* Accent — warm muted gold */
+  --accent: rgba(200, 160, 120, 0.8);
+  --accent-dim: rgba(200, 160, 120, 0.5);
+  --accent-subtle: rgba(200, 160, 120, 0.12);
+  --accent-border: rgba(200, 160, 120, 0.2);
+  --accent-solid: #c8a078;
+
+  /* Text */
+  --text-primary: rgba(255, 255, 255, 0.9);
+  --text-secondary: rgba(255, 255, 255, 0.55);
+  --text-tertiary: rgba(255, 255, 255, 0.3);
+  --text-disabled: rgba(255, 255, 255, 0.15);
+
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+
+  /* Status */
+  --status-online: rgba(120, 200, 140, 0.7);
+  --status-offline: rgba(255, 100, 100, 0.6);
+  --status-playing: var(--accent);
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+
+  /* Typography */
+  --font-sans: -apple-system, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  /* Safe areas for mobile */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+
+  /* Bottom nav height */
+  --nav-height: 56px;
+}

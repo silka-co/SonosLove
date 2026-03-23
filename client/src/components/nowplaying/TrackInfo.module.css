@@ -1,0 +1,26 @@
+.info {
+  text-align: center;
+  padding: var(--space-lg) 0 var(--space-sm);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artist {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.album {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}

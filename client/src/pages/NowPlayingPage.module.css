@@ -1,0 +1,17 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xl) var(--space-lg);
+  padding-top: calc(var(--safe-top) + var(--space-2xl));
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom));
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding-top: var(--space-2xl);
+  }
+}

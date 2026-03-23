@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+*.db
+*.db-journal
+.superpowers/
+server/keys/
+server/data/
+.DS_Store
